@@ -1,0 +1,52 @@
+# 编译输出（全部忽略）
+target/
+out/
+bin/
+classes/
+
+# Maven wrapper（如果需要提交的话可以保留，但通常不提交）
+.mvn/
+mvnw
+mvnw.cmd
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+!/.idea/workspace.xml
+!/.idea/tasks.xml
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
+
+### 日志和临时文件 ###
+*.log
+*.tmp
+*.temp
+*.bak
+
+### 敏感配置（如果有）###
+application-*.properties
+application-*.yml
+.env
