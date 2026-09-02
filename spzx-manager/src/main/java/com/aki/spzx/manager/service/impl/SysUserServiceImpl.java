@@ -6,7 +6,7 @@ import com.aki.spzx.manager.mapper.SysUserMapper;
 import com.aki.spzx.manager.service.SysUserService;
 import com.aki.spzx.model.dto.system.LoginDto;
 import com.aki.spzx.model.dto.system.SysUserDto;
-import com.aki.spzx.model.entity.system.SysRole;
+
 import com.aki.spzx.model.entity.system.SysUser;
 import com.aki.spzx.model.vo.common.ResultCodeEnum;
 import com.aki.spzx.model.vo.system.LoginVo;
