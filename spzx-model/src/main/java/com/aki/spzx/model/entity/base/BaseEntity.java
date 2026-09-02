@@ -1,5 +1,6 @@
 package com.aki.spzx.model.entity.base;
 
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
@@ -25,6 +26,7 @@ public class BaseEntity implements Serializable {
     private Date updateTime;
 
     @Schema(description = "是否删除")
+    @TableLogic
     private Integer isDeleted;
 
 }

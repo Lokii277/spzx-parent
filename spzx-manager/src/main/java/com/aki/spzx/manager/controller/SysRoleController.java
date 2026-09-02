@@ -46,4 +46,13 @@ public class SysRoleController {
         return Result.build(count, ResultCodeEnum.ERROR.getCode(), "角色修改失败");
     }
 
+    @Operation(summary = "删除角色")
+    @DeleteMapping("deleteSysRoleByID/{id}")
+    public Result deleteSysRole(@PathVariable("id") Long id) {
+        sysRoleService.deleteSysRoleById(id);
+        return Result.build(null, ResultCodeEnum.SUCCESS.getCode(),"角色删除成功");
+    }
+
+
+
 }

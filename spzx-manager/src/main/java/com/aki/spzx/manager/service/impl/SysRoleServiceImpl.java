@@ -1,10 +1,14 @@
 package com.aki.spzx.manager.service.impl;
 
+import com.aki.spzx.common.config.exception.AkiException;
 import com.aki.spzx.manager.mapper.SysRoleMapper;
+import com.aki.spzx.manager.mapper.SysUserMapper;
 import com.aki.spzx.manager.service.SysRoleService;
 import com.aki.spzx.model.dto.system.SysRoleDto;
 import com.aki.spzx.model.entity.system.SysRole;
 
+import com.aki.spzx.model.entity.system.SysUser;
+import com.aki.spzx.model.vo.common.ResultCodeEnum;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -57,5 +61,19 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
                 .set(SysRole::getRoleName, sysRole.getRoleName())
                 .set(SysRole::getRoleCode, sysRole.getRoleCode());
         return sysRoleMapper.update(null, updateWrapper);
+    }
+
+    @Override
+    public void deleteSysRoleById(Long id) {
+        // 先查询是否有角色
+        System.out.print(id);
+        SysRole sysRole = sysRoleMapper.selectById(id);
+        if (sysRole == null) {
+            throw new AkiException(ResultCodeEnum.DATA_NOT_EXIST);
+        }
+        //todo 增加业务判断 如果角色绑定用户 则不允许删除
+
+        // 如果存在角色且角色未绑定用户，则调用删除方法
+        sysRoleMapper.deleteById(id);
     }
 }

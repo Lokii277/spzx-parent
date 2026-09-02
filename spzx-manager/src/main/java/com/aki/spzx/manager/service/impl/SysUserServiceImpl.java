@@ -5,16 +5,20 @@ import com.aki.spzx.common.config.exception.AkiException;
 import com.aki.spzx.manager.mapper.SysUserMapper;
 import com.aki.spzx.manager.service.SysUserService;
 import com.aki.spzx.model.dto.system.LoginDto;
+import com.aki.spzx.model.dto.system.SysUserDto;
+import com.aki.spzx.model.entity.system.SysRole;
 import com.aki.spzx.model.entity.system.SysUser;
 import com.aki.spzx.model.vo.common.ResultCodeEnum;
 import com.aki.spzx.model.vo.system.LoginVo;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +37,6 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Override
     public LoginVo login(LoginDto loginDto) {
-
         //获取输入的验证码和存储到redis的key
         String captcha = loginDto.getCaptcha();
         String key = loginDto.getCodeKey();
@@ -49,9 +52,9 @@ public class SysUserServiceImpl implements SysUserService {
         //获取用户名
         String userName = loginDto.getUserName();
         LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
-             wrapper.eq(SysUser::getUserName, userName);
+        wrapper.eq(SysUser::getUserName, userName);
 
-            SysUser sysUser = sysUserMapper.selectOne(wrapper);
+        SysUser sysUser = sysUserMapper.selectOne(wrapper);
 
         if (sysUser == null) {
             throw new AkiException(ResultCodeEnum.USER_NOT_EXIST);
@@ -87,5 +90,31 @@ public class SysUserServiceImpl implements SysUserService {
     public SysUser logout(String token) {
         redisTemplate.delete(LOGIN_TOKEN_KEY_PREFIX + token);
         return null;
+    }
+
+    // 查询用户列表
+    @Override
+    public Page<SysUser> queryByPage(SysUserDto sysUserDto, Integer current, Integer limit) {
+        Page<SysUser> page = new Page<>(current, limit);
+        LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
+        // 关键词查询
+        if (StringUtils.hasText(sysUserDto.getKeyword())) {
+            wrapper.and(w -> w
+                    .like(SysUser::getUserName, sysUserDto.getKeyword())
+                    .or()
+                    .like(SysUser::getName, sysUserDto.getKeyword())
+                    .or()
+                    .like(SysUser::getPhone, sysUserDto.getKeyword())
+            );
+        }
+        // 拼接时间查询
+        if (StringUtils.hasText(sysUserDto.getCreateTimeBegin())) {
+            wrapper.ge(SysUser::getCreateTime, sysUserDto.getCreateTimeBegin());
+        }
+
+        if (StringUtils.hasText(sysUserDto.getCreateTimeEnd())) {
+            wrapper.le(SysUser::getCreateTime, sysUserDto.getCreateTimeEnd());
+        }
+        return sysUserMapper.selectPage(page, wrapper);
     }
 }

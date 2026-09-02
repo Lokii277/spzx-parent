@@ -12,4 +12,6 @@ public interface SysRoleService {
     boolean addSysRole(SysRoleDto sysRoleDto);
 
     Integer updateSysRole(SysRoleDto sysRoleDto);
+
+    void deleteSysRoleById(Long id);
 }

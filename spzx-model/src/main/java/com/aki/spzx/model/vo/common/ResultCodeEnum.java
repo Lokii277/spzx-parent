@@ -17,6 +17,7 @@ public enum ResultCodeEnum {
     ACCOUNT_STOP( 216, "账号已停用"),
     STOCK_LESS( 219, "库存不足"),
     ERROR(999 , "操作失败"),
+    DATA_NOT_EXIST(205 , "数据不存在"),
     ;
 
     private Integer code ;      // 业务状态码
