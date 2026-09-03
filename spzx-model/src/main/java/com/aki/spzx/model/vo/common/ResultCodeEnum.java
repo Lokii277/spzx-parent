@@ -18,6 +18,7 @@ public enum ResultCodeEnum {
     STOCK_LESS( 219, "库存不足"),
     ERROR(999 , "操作失败"),
     DATA_NOT_EXIST(205 , "数据不存在"),
+    USER_NAME_OR_PHONE_EMPTY(206 , "用户名或者手机号为空"),
     ;
 
     private Integer code ;      // 业务状态码

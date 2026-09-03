@@ -50,6 +50,12 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
+        <!-- spring security -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
         <!-- spzx-model依赖 -->
         <dependency>
             <groupId>com.aki</groupId>

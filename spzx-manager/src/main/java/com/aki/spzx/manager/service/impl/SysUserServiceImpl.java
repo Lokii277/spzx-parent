@@ -16,8 +16,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.UUID;
@@ -26,6 +26,9 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class SysUserServiceImpl implements SysUserService {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     @Autowired
     private SysUserMapper sysUserMapper;
     @Autowired
@@ -35,6 +38,7 @@ public class SysUserServiceImpl implements SysUserService {
 
     public static final String CAPTCHA_KEY_PREFIX = "user_validate:";
 
+    //todo 判断用户是否存在的代码重复太多，需要抽取成一个公共方法
     @Override
     public LoginVo login(LoginDto loginDto) {
         //获取输入的验证码和存储到redis的key
@@ -53,18 +57,14 @@ public class SysUserServiceImpl implements SysUserService {
         String userName = loginDto.getUserName();
         LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SysUser::getUserName, userName);
-
         SysUser sysUser = sysUserMapper.selectOne(wrapper);
-
         if (sysUser == null) {
             throw new AkiException(ResultCodeEnum.USER_NOT_EXIST);
         }
         //如果用户名存在则比较密码
         String dbPassword = sysUser.getPassword();
-        //加密用户输入的密码
-        String inputPassword = DigestUtils.md5DigestAsHex(loginDto.getPassword().getBytes());
         //比对输入两个结果，如果密码一致则登录成功
-        if (!dbPassword.equals(inputPassword)) {
+        if (!passwordEncoder.matches(loginDto.getPassword(), dbPassword)) {
             throw new AkiException(ResultCodeEnum.LOGIN_ERROR);
         }
         //登录成功，生成用户唯一标识Token
@@ -116,5 +116,56 @@ public class SysUserServiceImpl implements SysUserService {
             wrapper.le(SysUser::getCreateTime, sysUserDto.getCreateTimeEnd());
         }
         return sysUserMapper.selectPage(page, wrapper);
+    }
+
+    @Override
+    public void addSysuser(SysUser sysUser) {
+        // 判断用户名是否重复
+        LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SysUser::getUserName, sysUser.getUserName());
+        SysUser user = sysUserMapper.selectOne(wrapper);
+        if (user != null) {
+            throw new AkiException(ResultCodeEnum.USER_NAME_IS_EXISTS);
+        }
+        // 密码加密
+        sysUser.setPassword(passwordEncoder.encode(sysUser.getPassword()));
+        sysUserMapper.insert(sysUser);
+    }
+
+    @Override
+    public void updateSysuser(Long id, SysUser sysUser) {
+        // 先根据id判断用户是否存在
+        LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SysUser::getId, id);
+        SysUser user = sysUserMapper.selectOne(wrapper);
+        if (user == null) {
+            throw new AkiException(ResultCodeEnum.USER_NOT_EXIST);
+        }
+        // todo 操作权限认证
+        // 用户名不能为空 手机号不能为空
+        if (sysUser.getUserName() == null || sysUser.getPhone() == null) {
+            throw new AkiException(ResultCodeEnum.USER_NAME_OR_PHONE_EMPTY);
+        }
+        // 用户名唯一性约束校验
+        LambdaQueryWrapper<SysUser> wrapper1 = new LambdaQueryWrapper<>();
+        wrapper.eq(SysUser::getUserName, sysUser.getUserName());
+        if (sysUserMapper.selectOne(wrapper1) != null){
+            throw new AkiException(ResultCodeEnum.USER_NAME_IS_EXISTS);
+        }
+        sysUserMapper.updateById(sysUser);
+        // todo 记录修改日志
+
+    }
+
+    @Override
+    public void deleteSysuser(Long id) {
+        // 先判断用户是否存在
+        LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SysUser::getId, id);
+        if (sysUserMapper.selectOne(wrapper) == null) {
+            throw new AkiException(ResultCodeEnum.USER_NOT_EXIST);
+        }
+        sysUserMapper.deleteById(id);
+        // todo 删除用户相关缓存
     }
 }

@@ -13,11 +13,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 //解决跨域问题的配置类
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
-    @Autowired
-    private LoginAuthInterceptor loginAuthInterceptor;
+//    @Autowired
+//    private LoginAuthInterceptor loginAuthInterceptor;
 
-    @Autowired
-    private UserProperties userProperties;
+//    @Autowired
+//    private UserProperties userProperties;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -28,11 +28,11 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                 .allowCredentials(true);  //允许携带凭证
     }
 
-    //注册拦截器
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(loginAuthInterceptor)
-                .addPathPatterns("/**")  //不需要拦截的请求
-                .excludePathPatterns(userProperties.getNoAuthUrls()); //需要拦截的请求 全部请求
-    }
+//    //注册拦截器
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        registry.addInterceptor(loginAuthInterceptor)
+//                .addPathPatterns("/**")  //不需要拦截的请求
+//                .excludePathPatterns(userProperties.getNoAuthUrls()); //需要拦截的请求 全部请求
+//    }
 }

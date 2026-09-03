@@ -14,4 +14,10 @@ public interface SysUserService {
     SysUser logout(String token);
 
     Page<SysUser> queryByPage(SysUserDto sysUserDto, Integer current, Integer limit);
+
+    void addSysuser(SysUser sysUser);
+
+    void updateSysuser(Long id, SysUser sysUser);
+
+    void deleteSysuser(Long id);
 }
