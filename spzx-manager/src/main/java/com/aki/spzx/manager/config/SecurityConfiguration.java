@@ -11,7 +11,8 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfiguration {
-
+    @Autowired
+    private TokenAuthenticationFilter tokenAuthenticationFilter;
 
     @Autowired
     private UserProperties userProperties;
@@ -26,7 +27,7 @@ public class SecurityConfiguration {
         http
                 // 暂时关闭 CSRF
                 .csrf(csrf -> csrf.disable())
-
+                .addFilterBefore(tokenAuthenticationFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
                 // 请求权限配置
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
