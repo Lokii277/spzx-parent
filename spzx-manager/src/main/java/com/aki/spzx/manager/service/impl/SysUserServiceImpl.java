@@ -2,6 +2,7 @@ package com.aki.spzx.manager.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.aki.spzx.common.config.exception.AkiException;
+import com.aki.spzx.manager.aspect.BusinessLog;
 import com.aki.spzx.manager.mapper.SysUserMapper;
 import com.aki.spzx.manager.service.SysUserService;
 import com.aki.spzx.model.dto.system.LoginDto;
@@ -117,7 +118,12 @@ public class SysUserServiceImpl implements SysUserService {
         }
         return sysUserMapper.selectPage(page, wrapper);
     }
-
+    @BusinessLog(
+            module = "用户管理",
+            operation = "新增用户",
+            businessType = "INSERT",
+            businessId = "#sysUser.id"
+    )
     @Override
     public void addSysuser(SysUser sysUser) {
         // 判断用户名是否重复
@@ -131,7 +137,11 @@ public class SysUserServiceImpl implements SysUserService {
         sysUser.setPassword(passwordEncoder.encode(sysUser.getPassword()));
         sysUserMapper.insert(sysUser);
     }
-
+    @BusinessLog(
+            module = "用户管理",
+            operation = "修改用户",
+            businessType = "UPDATE"
+    )
     @Override
     public void updateSysuser(Long id, SysUser sysUser) {
         // 先根据id判断用户是否存在
