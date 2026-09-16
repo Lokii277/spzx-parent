@@ -1,4 +1,4 @@
-package com.aki.spzx.manager.aspect;
+package com.aki.spzx.manager.log.aspect;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

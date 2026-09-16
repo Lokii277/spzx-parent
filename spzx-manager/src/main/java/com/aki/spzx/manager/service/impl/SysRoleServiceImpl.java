@@ -2,12 +2,11 @@ package com.aki.spzx.manager.service.impl;
 
 import com.aki.spzx.common.config.exception.AkiException;
 import com.aki.spzx.manager.mapper.SysRoleMapper;
-import com.aki.spzx.manager.mapper.SysUserMapper;
 import com.aki.spzx.manager.service.SysRoleService;
 import com.aki.spzx.model.dto.system.SysRoleDto;
 import com.aki.spzx.model.entity.system.SysRole;
 
-import com.aki.spzx.model.entity.system.SysUser;
+
 import com.aki.spzx.model.vo.common.ResultCodeEnum;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;

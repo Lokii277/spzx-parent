@@ -2,7 +2,7 @@ package com.aki.spzx.manager.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.aki.spzx.common.config.exception.AkiException;
-import com.aki.spzx.manager.aspect.BusinessLog;
+import com.aki.spzx.manager.log.aspect.BusinessLog;
 import com.aki.spzx.manager.mapper.SysUserMapper;
 import com.aki.spzx.manager.service.SysUserService;
 import com.aki.spzx.model.dto.system.LoginDto;
@@ -140,7 +140,8 @@ public class SysUserServiceImpl implements SysUserService {
     @BusinessLog(
             module = "用户管理",
             operation = "修改用户",
-            businessType = "UPDATE"
+            businessType = "UPDATE",
+            businessId = "#id"
     )
     @Override
     public void updateSysuser(Long id, SysUser sysUser) {
