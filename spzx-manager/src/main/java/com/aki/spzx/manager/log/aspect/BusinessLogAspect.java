@@ -52,47 +52,50 @@ public class BusinessLogAspect {
         try {
             // 先执行方法，避免某些Insert方法拿不到ID
             result = joinPoint.proceed();
-        }catch (Exception e) {
+            return result;
+        }catch (Throwable e) {
             System.out.println("方法执行异常：" + e.getMessage());
             errorMsg = e.getMessage();
             status = 0;
             throw e;  // 继续抛出，不影响原有异常逻辑
-        }
-        // 计算方法执行时间
-        long costTime = System.currentTimeMillis() - startTime;
-        // 创建 SpEL 上下文对象
-        StandardEvaluationContext context = new StandardEvaluationContext();
-        // 把参数放进去
-        variables.forEach(context::setVariable);
+        }finally {
+            // 计算方法执行时间
+            long costTime = System.currentTimeMillis() - startTime;
+            // 创建 SpEL 上下文对象
+            StandardEvaluationContext context = new StandardEvaluationContext();
+            // 把参数放进去
+            variables.forEach(context::setVariable);
 
-        // 解析业务ID
-        String businessId = null;
-        if (StringUtils.hasText(businessLog.businessId())) {
-            try {
-                Object value = parser.parseExpression(businessLog.businessId()).getValue(context);
-                if (value != null) {
-                    businessId = value.toString();
+            // 解析业务ID
+            String businessId = null;
+            if (StringUtils.hasText(businessLog.businessId())) {
+                try {
+                    Object value = parser.parseExpression(businessLog.businessId()).getValue(context);
+                    if (value != null) {
+                        businessId = value.toString();
+                    }
+                } catch (Exception e) {
+                    System.out.println("解析 业务Id 失败：" + businessLog.businessId());
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                System.out.println("解析 业务Id 失败：" + businessLog.businessId());
-                e.printStackTrace();
             }
+            SysUser currentUser = AuthContextUtil.get();
+            SysBusinessLog sysBusinessLog = new SysBusinessLog();
+            if (currentUser != null) {
+                sysBusinessLog.setOperUserId(currentUser.getId());
+                sysBusinessLog.setOperUserName(currentUser.getUserName());
+            }
+            sysBusinessLog.setBusinessId(businessId);
+            sysBusinessLog.setModule(businessLog.module());
+            sysBusinessLog.setOperation(businessLog.operation());
+            sysBusinessLog.setBusinessType(businessLog.businessType());
+            sysBusinessLog.setStatus(status);
+            sysBusinessLog.setErrorMsg(errorMsg);
+            sysBusinessLog.setCostTime(costTime);
+            sysBusinessLog.setOperTime(new Date());
+            businessLogService.saveLog(sysBusinessLog);
+
         }
-        SysUser currentUser = AuthContextUtil.get();
-        SysBusinessLog sysBusinessLog = new SysBusinessLog();
-        if (currentUser != null) {
-            sysBusinessLog.setOperUserId(currentUser.getId());
-            sysBusinessLog.setOperUserName(currentUser.getUserName());
-        }
-        sysBusinessLog.setBusinessId(businessId);
-        sysBusinessLog.setModule(businessLog.module());
-        sysBusinessLog.setOperation(businessLog.operation());
-        sysBusinessLog.setBusinessType(businessLog.businessType());
-        sysBusinessLog.setStatus(status);
-        sysBusinessLog.setErrorMsg(errorMsg);
-        sysBusinessLog.setCostTime(costTime);
-        sysBusinessLog.setOperTime(new Date());
-        businessLogService.saveLog(sysBusinessLog);
-        return result;
+
     }
 }
